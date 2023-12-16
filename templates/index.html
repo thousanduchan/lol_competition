@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<h1 class="text-center" style="margin: 20px auto;">점수판</h1>
+<div class="text-center">
+    <button class="btn btn-dark btn-sm" onclick="location.href='{% url 'register' %}'">팀 등록하기</button> <br>
+    <button type="button" class="btn btn-dark btn-sm" style="margin-top: 10px;" data-bs-toggle="modal" data-bs-target="#modal">설명</button>
+
+    <div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Rule</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <p>팀 등록 후 진행</p>
+              <p>이기면 3점, 지면 1점</p>
+              <p>점수판에서 팀 클릭하면 정보 확인 가능</p>
+              <p>한 경기 끝나면 승패 여부 관리자에게 알리기</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>등수</th>
+            <th>팀 이름</th>
+            <th>승점</th>
+            {% if user.is_staff %}
+            <th>+/-</th>
+            {% endif %}
+        </tr>
+    </thead>
+    {% for team in obj_team %}
+    <tr data-bs-toggle="modal" data-bs-target="#{{ team.id }} ">
+        <td class="h3" id="rank{{ forloop.counter }}">{{ forloop.counter }}등</td>
+        <td class="h3">{{ team.name }}</td>
+        <td class="h3 text-muted">{{ team.score }}점</td>
+        {% if user.is_staff %}
+        <form method="post" action="{% url 'control_score' team_id=team.id %}">
+            {% csrf_token %}
+            <td>
+                <button class="btn btn-secondary" name="control" value=1>+</button>
+                <button class="btn btn-secondary" name="control" value=-1>-</button>
+            </td>
+        </form>
+        <form method="post">
+            {% csrf_token %}
+            <td><button name="team_id" value="{{ team.id }}" class="btn btn-success">우승</button></td>
+        </form>
+        <form method="post" action="{% url 'delete_team' team_id=team.id %}">
+            {% csrf_token %}
+            <td><button class="btn btn-danger">X</button></td>
+        </form>
+
+        {% endif %}
+    </tr>
+    <div class="modal fade" id="{{ team.id }}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">{{ team.name }}</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <p>팀원</p>
+              <p>{{ team.members }}</p>
+              <img src="/media/{{team.image}}" style="width: 450px;">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+</table>
+<script>
+    rank1 = document.getElementById('rank1');
+    rank2 = document.getElementById('rank2');
+    rank3 = document.getElementById('rank3');
+
+    if(rank1) {
+        rank1.style = 'color: gold; text-shadow: -0.5px 0px black, 0px 0.5px black, 0.5px 0px black, 0px -0.5px black';
+    }
+
+
+    if(rank2){
+        rank2.style = 'color: silver; text-shadow: -1px 0px black, 0px 1px black, 1px 0px black, 0px -1px black';
+    }
+
+    if(rank3) {
+        rank3.style = 'color: #bc8f8f; text-shadow: -1px 0px black, 0px 1px black, 1px 0px black, 0px -1px black';
+    }
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1 class="text-center">등록</h1>
+    <div style="width: 800px; height: 100px; margin: 0 auto;">
+        <form method="post" enctype="multipart/form-data" class="text-center">
+            {% csrf_token %}
+            <div class="input-group input-group-lg" style="margin: 15px auto;">
+                <span class="input-group-text">팀 이름 : </span>
+                <input class="form-control" type="text" name="team_name">
+            </div>
+
+            <div class="input-group mb-3">
+                <label class="input-group-text" for="image">단체 사진</label>
+                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+            </div>
+
+            {% for i in '01234'|make_list %}
+            <div class="input-group mb-3">
+                <span class="input-group-text">팀원 {{forloop.counter}} 이름 : </span>
+                <input class="form-control" type="text" name="member{{forloop.counter}}">
+            </div>
+            {% endfor %}
+            <button type='button' class="btn btn-dark" onclick="location.href='{% url 'home' %}'">점수판으로</button>
+            <button class="btn btn-dark">등록</button>
+        </form>
+
+    </div>
+
+
+{% endblock %}
